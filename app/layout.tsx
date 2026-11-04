@@ -4,6 +4,8 @@ import { JetBrains_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 
+import { Toaster } from "@/components/ui/sonner";
+
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
@@ -32,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Providers>
           <body className="min-h-full flex flex-col font-sans">
             {children}
+            <Toaster position="top-right" richColors />
           </body>
         </Providers>
       </AuthProvider>

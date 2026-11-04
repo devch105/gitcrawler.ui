@@ -6,4 +6,7 @@ export const ENDPOINTS = {
   LOGOUT: `${BACKEND_HOST_URL}/auth/logout`,
   REPOS: `${BACKEND_HOST_URL}/api/repos`,
   CHAT_SESSIONS: `${BACKEND_HOST_URL}/api/chat/sessions`,
+
+  // Notification settings
+  NOTIFICATION_EMAIL: `${BACKEND_HOST_URL}/api/settings/email`,
 };

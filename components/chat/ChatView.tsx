@@ -7,10 +7,10 @@ import MessageList from "@/components/chat/message-list";
 import { Button } from "@/components/ui/button";
 import { ENDPOINTS } from "@/utilities/endpoints";
 import { LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-
 import { LuPanelLeftClose } from "react-icons/lu";
+import { toast } from "sonner";
 
 import { useChatMessages } from "@/hooks/use-chat-message";
 import {
@@ -25,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 interface ChatViewProps {
   repoId: string;
 }
+
 
 interface RepositorySummary {
   id: string;
@@ -44,23 +45,51 @@ export default function ChatView({ repoId }: ChatViewProps) {
   const sessions = sessionsQuery.data ?? [];
   const messages = messagesQuery.data ?? [];
 
+  const params = useParams<{ repoId: string }>();
+  const searchParams = useSearchParams();
   const router = useRouter();
+ 
+  const sessionId = searchParams.get("sessionId");
 
   useEffect(() => {
-    if (!sessionsQuery.isSuccess) return;
+  if (!sessionsQuery.isSuccess) return;
 
-    // Preserve the selected session if it still exists.
-    if (
-      activeSessionId &&
-      sessions.some((session) => session.id === activeSessionId)
-    ) {
-      return;
-    }
+  // Prefer the session specified in the URL
+  const requestedSession = sessions.find(
+    (session) => session.id === sessionId
+  );
 
-    // Select the most recent session when history first loads.
-    setActiveSessionId(sessions[0]?.id ?? null);
-  }, [sessionsQuery.isSuccess, sessions, activeSessionId]);
+  if (requestedSession) {
+    setActiveSessionId(requestedSession.id);
+    return;
+  }
 
+  // Preserve the current selection if it still exists
+  if (
+    activeSessionId &&
+    sessions.some((session) => session.id === activeSessionId)
+  ) {
+    return;
+  }
+
+  // Otherwise select the most recent session
+  const nextSessionId = sessions[0]?.id ?? null;
+
+  setActiveSessionId(nextSessionId);
+
+  if (nextSessionId) {
+    router.replace(
+      `/chat/${repoId}?sessionId=${nextSessionId}`
+    );
+  }
+}, [
+  sessionsQuery.isSuccess,
+  sessions,
+  activeSessionId,
+  sessionId,
+  repoId,
+  router,
+]);
 
   useEffect(() => {
   let cancelled = false;
@@ -125,6 +154,75 @@ export default function ChatView({ repoId }: ChatViewProps) {
   const queryClient = useQueryClient();
 
 const streamingSessionIdRef = useRef<string | null>(null);
+
+
+async function handleDeleteSession(id: string): Promise<void> {
+  // const confirmed = window.confirm(
+  //   "Are you sure you want to delete this chat? All messages will be permanently deleted."
+  // );
+
+  // if (!confirmed) return;
+
+  try {
+    const response = await fetch(
+      `${ENDPOINTS.CHAT_SESSIONS}/${id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete chat session");
+    }
+
+    // Remove the deleted session from React Query cache
+    const remainingSessions = sessions.filter(
+      (session) => session.id !== id
+    );
+
+    queryClient.setQueryData(
+      ["chat-sessions", repoId],
+      remainingSessions
+    );
+
+    // Remove cached messages for the deleted session
+    queryClient.removeQueries({
+      queryKey: ["chat-messages", id],
+    });
+
+    // If the deleted chat was open, select another one
+    if (activeSessionId === id) {
+      const nextSessionId = remainingSessions[0]?.id ?? null;
+
+      setActiveSessionId(nextSessionId);
+
+      router.replace(
+        nextSessionId
+          ? `/chat/${repoId}?sessionId=${nextSessionId}`
+          : `/chat/${repoId}`
+      );
+    }
+
+    toast.success("Chat deleted successfully!");
+  } catch (error) {
+    toast.error(
+      error instanceof Error
+        ? error.message
+        : "Unable to delete chat"
+    );
+  }
+}
+
+
+function handleSelectSession(id: string) {
+  setActiveSessionId(id);
+
+  router.replace(
+    `/chat/${repoId}?sessionId=${id}`
+  );
+}
+
 
 function upsertMessage(sessionId: string, message: ChatMessage) {
   queryClient.setQueryData<ChatMessage[]>(
@@ -194,13 +292,14 @@ async function handleSendMessage(content: string) {
     <main className="flex h-dvh overflow-hidden bg-background">
       {sidebarOpen && (
         <div className="hidden md:block">
-          <ChatSidebar
+         <ChatSidebar
             sessions={sessions}
             activeSessionId={activeSessionId}
             isLoading={sessionsQuery.isLoading}
             isCreating={createSession.isPending}
             onNewChat={() => void handleNewChat()}
-            onSelectSession={setActiveSessionId}
+            onSelectSession={handleSelectSession}
+            onDeleteSession={handleDeleteSession}
             onClose={() => setSidebarOpen(false)}
             onRedirect={handleRedirect}
           />

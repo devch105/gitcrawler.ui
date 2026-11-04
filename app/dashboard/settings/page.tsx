@@ -1,6 +1,7 @@
 
 "use client";
 
+import NotificationEmailCard from "@/components/settings/NotificationEmailCard";
 import { useAuth } from "@/context/AuthContext";
 import {
   Bell,
@@ -408,7 +409,11 @@ export default function SettingsPage() {
 
             {/* Notifications */}
             {activeSection === "notifications" && (
-              <SettingsCard>
+             
+            <> 
+              <NotificationEmailCard />
+
+             <SettingsCard>
                 <SectionHeading
                   title="Indexing notifications"
                   description="Choose the indexing events you want to receive updates about."
@@ -438,6 +443,8 @@ export default function SettingsPage() {
                   </p>
                 </div>
               </SettingsCard>
+
+              </> 
             )}
 
             {/* Security */}

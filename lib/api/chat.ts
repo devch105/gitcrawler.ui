@@ -237,3 +237,17 @@ export async function fetchRecentChats(
   
   return handleResponse<RecentChat[]>(response);
 }
+
+export async function deleteChatSession(sessionId: string) {
+    const response = await fetch(
+        `${ENDPOINTS.CHAT_SESSIONS}/${sessionId}`,
+        {
+            method: "DELETE",
+            credentials: "include",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to delete chat session");
+    }
+}
