@@ -19,9 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "GitCrawler",
   description: "GitHub repository analysis platform",
-  icons :{
-      icon: "/icon.png",
-  }
+ 
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
