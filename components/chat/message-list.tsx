@@ -1,8 +1,15 @@
+
 "use client";
 
-import type { ChatMessage } from "@/types/chat";
 import ChatMessageView from "@/components/chat/chat-message";
-import { LoaderCircle, MessageSquareText } from "lucide-react";
+import MarkdownRenderer from "@/components/chat/markdown-renderer";
+import type { ChatMessage } from "@/types/chat";
+import { useEffect, useRef } from "react";
+
+import {
+  LoaderCircle,
+  MessageSquareText,
+} from "lucide-react";
 
 interface MessageListProps {
   messages: ChatMessage[];
@@ -19,6 +26,17 @@ export default function MessageList({
   streamedText = "",
   isStreaming = false,
 }: MessageListProps) {
+
+const bottomRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  bottomRef.current?.scrollIntoView({
+    behavior: isStreaming ? "auto" : "smooth",
+    block: "end",
+  });
+}, [messages, streamedText, isStreaming]);
+
+
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -39,18 +57,20 @@ export default function MessageList({
     );
   }
 
-  if (messages.length === 0) {
+  if (messages.length === 0 && !isStreaming) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 text-center">
         <div className="mb-4 flex size-12 items-center justify-center rounded-2xl border bg-muted/40">
           <MessageSquareText className="size-6 text-muted-foreground" />
         </div>
 
-        <h2 className="text-lg font-semibold">What would you like to know?</h2>
+        <h2 className="text-lg font-semibold">
+          What would you like to know?
+        </h2>
 
         <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-          Ask GitCrawler about your repository's architecture, functions,
-          dependencies, or implementation details.
+          Ask GitCrawler about your repository's architecture,
+          functions, dependencies, or implementation details.
         </p>
       </div>
     );
@@ -58,24 +78,38 @@ export default function MessageList({
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-7 px-4 py-8">
+      {/* Previously completed messages */}
       {messages.map((message) => (
-        <ChatMessageView key={message.id} message={message} />
+        <ChatMessageView
+          key={message.id}
+          message={message}
+        />
       ))}
+
+      {/* Live streaming response */}
       {isStreaming && (
-  <div className="flex justify-start">
-    <div className="max-w-[85%] rounded-2xl bg-muted px-4 py-3">
-      {streamedText ? (
-        <p className="whitespace-pre-wrap break-words">
-          {streamedText}
-        </p>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          Thinking...
-        </p>
+        <article className="flex w-full justify-start">
+          <div className="min-w-0 max-w-[90%] flex-1">
+            <div className="mb-2 text-xs font-medium text-muted-foreground">
+              GitCrawler
+            </div>
+
+            <div className="min-w-0 overflow-hidden rounded-2xl border bg-card px-4 py-3">
+              {streamedText ? (
+                <MarkdownRenderer content={streamedText} />
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <LoaderCircle className="size-4 animate-spin" />
+                  Thinking...
+                </div>
+              )}
+            </div>
+          </div>
+        </article>
       )}
-    </div>
-  </div>
-)}
+
+      {/* Auto-scroll target */}
+<div ref={bottomRef} aria-hidden="true" className="h-px w-full" />
     </div>
   );
 }
