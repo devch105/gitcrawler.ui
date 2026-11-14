@@ -43,7 +43,7 @@ export default function ChatSidebar({
   const [deleteSessionId, setDeleteSessionId] = useState<string | null>(null);
 const [isDeleting, setIsDeleting] = useState(false);
   return (
-    <aside className="flex h-full w-72 shrink-0 flex-col border-r bg-muted/20 p-3">
+    <aside className="flex h-full w-72 shrink-0 flex-col border-r bg-muted/5 p-3">
 
       {/* Header */}
       <div className="mb-5 flex items-center justify-between px-1">

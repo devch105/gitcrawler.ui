@@ -14,6 +14,8 @@ import { useMemo } from "react";
 
 import { useRecentlyIndexedRepos } from "@/hooks/use-recently-indexed-repos";
 import { CgGitter } from "react-icons/cg";
+import DashboardCard from "@/components/dashboard/dashboard-card";
+
 function formatIndexedDate(value: string | null) {
   if (!value) return "Date unavailable";
 
@@ -33,13 +35,12 @@ export default function RecentlyIndexedRepos() {
   const router = useRouter();
 
   const {
-  data: repositories,
-  isPending,
-  isError,
-  error,
-  refetch,
-} = useRecentlyIndexedRepos(5);
-
+    data: repositories,
+    isPending,
+    isError,
+    error,
+    refetch,
+  } = useRecentlyIndexedRepos(5);
 
   const recentRepositories = useMemo(() => {
     return (repositories ?? [])
@@ -59,17 +60,18 @@ export default function RecentlyIndexedRepos() {
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">  
-          <CgGitter size={22}/>
-          <span className="text-lg font-semibold text-zinc-900">
-            Recently Indexed Repos
-          </span>
-         
-        </div>
-         <p className="mt-1  ml-4 text-sm text-zinc-500">
+          <div className="flex items-center gap-2">
+            <CgGitter size={22} />
+            <span className="text-lg font-semibold text-zinc-900">
+              Recently Indexed Repos
+            </span>
+          </div>
+
+          <p className="mt-1 ml-4 text-sm text-zinc-500">
             Your latest successfully indexed repositories.
           </p>
-      </div>
+        </div>
+
         <button
           type="button"
           onClick={() => void refetch()}
@@ -123,13 +125,11 @@ export default function RecentlyIndexedRepos() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {recentRepositories.map((repo) => (
-            <button
+            <DashboardCard
               key={repo.id}
-              type="button"
               onClick={() =>
                 router.push(`/chat/${encodeURIComponent(repo.id)}`)
               }
-              className="group rounded-xl border border-zinc-200 bg-white p-5 text-left transition hover:border-zinc-400 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="rounded-lg bg-zinc-100 p-2">
@@ -181,7 +181,7 @@ export default function RecentlyIndexedRepos() {
                 </p>
                 <ArrowRight className="h-4 w-4 shrink-0 text-zinc-400 transition group-hover:translate-x-1 group-hover:text-zinc-800" />
               </div>
-            </button>
+            </DashboardCard>
           ))}
         </div>
       )}

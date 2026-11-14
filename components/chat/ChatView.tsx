@@ -289,7 +289,7 @@ async function handleSendMessage(content: string) {
 }
 
   return (
-    <main className="flex h-dvh overflow-hidden bg-background">
+    <main className="flex h-dvh overflow-hidden page-background">
       {sidebarOpen && (
         <div className="hidden md:block">
          <ChatSidebar
@@ -307,7 +307,7 @@ async function handleSendMessage(content: string) {
       )}
 
       <section className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-3 border-b px-3 sm:px-4">
+        <header className="sticky top-3 z-50 mx-4 rounded-2xl border border-slate-200/80 bg-white/75 shadow-lg shadow-slate-900/[0.04] backdrop-blur-xl md:mx-auto md:max-w-7xl"> 
           <Button
             variant="ghost"
             size="icon"

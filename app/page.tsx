@@ -1,7 +1,5 @@
 "use client";
 
-import { FaGitkraken } from "react-icons/fa";
-
 import { useAuth } from "@/context/AuthContext";
 import { ENDPOINTS } from "@/utilities/endpoints";
 import {
@@ -11,15 +9,15 @@ import {
   Code2,
   Database,
   GitBranch,
-
   MessagesSquare,
   Search,
   Sparkles,
   Zap,
 } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaGitkraken } from "react-icons/fa";
 
 const features = [
   {
@@ -81,30 +79,51 @@ const steps = [
   },
 ];
 
+const reveal = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const stagger = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.09,
+      delayChildren: 0.05,
+    },
+  },
+};
+
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-
-    const handleSignIn = () => {
-      window.location.href = ENDPOINTS.GITHUB_LOGIN;
-    };
+  const shouldReduceMotion = useReducedMotion();
 
   const handleGetStarted = () => {
     if (loading) return;
 
     if (user) {
       router.push("/dashboard");
-      return;
-    }else{
+    } else {
       router.push(ENDPOINTS.GITHUB_LOGIN);
-      return ;
     }
   };
+
+  const initial = shouldReduceMotion ? false : "hidden";
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#F8FAFC] text-[#111827]">
       {/* Navigation */}
-      <nav className="sticky top-3 z-50 mx-4 rounded-2xl border border-slate-200/80 bg-white/75 shadow-lg shadow-slate-900/[0.04] backdrop-blur-xl md:mx-auto md:max-w-7xl">
+      <motion.nav
+        initial={shouldReduceMotion ? false : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="sticky top-3 z-50 mx-4 rounded-2xl border border-slate-200/80 bg-white/75 shadow-lg shadow-slate-900/[0.04] backdrop-blur-xl md:mx-auto md:max-w-7xl"
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
           <Link href="/" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-100">
@@ -134,31 +153,46 @@ export default function HomePage() {
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Hero */}
       <section className="relative px-5 pb-20 pt-20 md:px-8 md:pb-28 md:pt-28">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(203,213,225,0.38),_transparent_68%)]" />
 
-        <div className="relative mx-auto max-w-5xl text-center">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-2 text-sm text-slate-700 shadow-sm backdrop-blur-xl">
+        <motion.div
+          className="relative mx-auto max-w-5xl text-center"
+          variants={stagger}
+          initial={initial}
+          animate="visible"
+        >
+          <motion.div
+            variants={reveal}
+            className="mb-7 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-2 text-sm text-slate-700 shadow-sm backdrop-blur-xl"
+          >
             <Sparkles className="h-4 w-4 text-slate-700" />
             AI-powered codebase exploration
-          </div>
+          </motion.div>
 
-          <h1 className="mx-auto max-w-4xl text-4xl font-semibold leading-[1.12] tracking-tight sm:text-5xl md:text-7xl">
+          <motion.h1
+            variants={reveal}
+            className="mx-auto max-w-4xl text-4xl font-semibold leading-[1.12] tracking-tight sm:text-5xl md:text-7xl"
+          >
             Understand your codebase.
-            <span className="mt-2 block text-[#111827]">
-              Faster.
-            </span>
-          </h1>
+            <span className="mt-2 block text-[#111827]">Faster.</span>
+          </motion.h1>
 
-          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-slate-600 md:text-lg md:leading-8">
+          <motion.p
+            variants={reveal}
+            className="mx-auto mt-7 max-w-2xl text-base leading-7 text-slate-600 md:text-lg md:leading-8"
+          >
             Connect your GitHub repositories, index your code, and ask questions
             about your projects with AI-powered codebase assistance.
-          </p>
+          </motion.p>
 
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <motion.div
+            variants={reveal}
+            className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          >
             <button
               type="button"
               onClick={handleGetStarted}
@@ -180,9 +214,12 @@ export default function HomePage() {
             >
               Explore how it works
             </a>
-          </div>
+          </motion.div>
 
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-500">
+          <motion.div
+            variants={reveal}
+            className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-slate-500"
+          >
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5" />
               GitHub authentication
@@ -191,15 +228,18 @@ export default function HomePage() {
               <CheckCircle2 className="h-3.5 w-3.5" />
               Repository-aware chat
             </span>
-          </div>
+          </motion.div>
 
           {/* Product preview */}
-          <div className="mx-auto mt-16 max-w-4xl rounded-2xl border border-slate-200/90 bg-white/55 p-2 shadow-2xl shadow-slate-900/[0.08] backdrop-blur-2xl md:mt-20">
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white/80 shadow-xl shadow-slate-900/[0.05]">
+          <motion.div
+            variants={reveal}
+            className="mx-auto mt-16 max-w-4xl rounded-2xl border border-slate-200/5 bg-white/55 p-2 shadow-2xl shadow-slate-900/[0.08] backdrop-blur-2xl md:mt-20"
+          >
+            <div className="overflow-hidden rounded-xl border border-slate-300 bg-white/80 shadow-xl shadow-slate-900/[0.08]">
               <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-3">
-                <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-                <span className="h-2.5 w-2.5 rounded-full bg-slate-400" />
-                <span className="h-2.5 w-2.5 rounded-full bg-slate-500" />
+                <span className="h-2.5 w-2.5 rounded-full bg-yellow-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
                 <span className="ml-3 text-xs text-slate-500">
                   GitCrawler / Repository Chat
                 </span>
@@ -255,14 +295,24 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Features */}
-      <section id="features" className="border-t border-slate-200/80 px-5 py-20 md:px-8 md:py-28">
+      <motion.section
+        id="features"
+        className="border-t border-slate-200/80 px-5 py-20 md:px-8 md:py-28"
+        variants={stagger}
+        initial={initial}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.12 }}
+      >
         <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-2xl text-center">
+          <motion.div
+            variants={reveal}
+            className="mx-auto max-w-2xl text-center"
+          >
             <p className="text-sm font-medium text-slate-700">FEATURES</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
               Spend less time searching.
@@ -272,18 +322,27 @@ export default function HomePage() {
               Bring repository indexing, contextual code search, and AI-assisted
               exploration into one workflow.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            variants={stagger}
+            className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {features.map((feature) => {
               const Icon = feature.icon;
 
               return (
-                <article
+                <motion.article
                   key={feature.title}
-                  className="group rounded-2xl border border-slate-200/90 bg-white/65 p-6 shadow-lg shadow-slate-900/[0.035] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-slate-300 hover:bg-white/90 hover:shadow-xl hover:shadow-slate-900/[0.07]"
+                  variants={reveal}
+                  whileHover={
+                    shouldReduceMotion
+                      ? undefined
+                      : { y: -3, transition: { duration: 0.2 } }
+                  }
+                  className="group rounded-2xl border border-slate-200/90 bg-white/65 p-6 shadow-lg shadow-slate-900/[0.035] backdrop-blur-xl transition-colors duration-200 hover:border-slate-300 hover:bg-white/90"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white/75 transition group-hover:border-slate-300 group-hover:bg-slate-100">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white/75 transition-colors group-hover:border-slate-300 group-hover:bg-slate-100">
                     <Icon className="h-5 w-5 text-slate-800 group-hover:text-slate-700" />
                   </div>
                   <h3 className="mt-5 text-base font-semibold">
@@ -292,20 +351,27 @@ export default function HomePage() {
                   <p className="mt-3 text-sm leading-6 text-slate-600">
                     {feature.description}
                   </p>
-                </article>
+                </motion.article>
               );
             })}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* How it works */}
-      <section
+      <motion.section
         id="how-it-works"
         className="border-t border-slate-200/80 px-5 py-20 md:px-8 md:py-28"
+        variants={stagger}
+        initial={initial}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.12 }}
       >
         <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-2xl text-center">
+          <motion.div
+            variants={reveal}
+            className="mx-auto max-w-2xl text-center"
+          >
             <p className="text-sm font-medium text-slate-700">HOW IT WORKS</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
               From repository to answers.
@@ -313,15 +379,24 @@ export default function HomePage() {
             <p className="mt-5 text-base leading-7 text-slate-600">
               Three steps to start exploring your codebase.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-3">
+          <motion.div
+            variants={stagger}
+            className="mt-14 grid gap-5 md:grid-cols-3"
+          >
             {steps.map((step) => {
               const Icon = step.icon;
 
               return (
-                <article
+                <motion.article
                   key={step.number}
+                  variants={reveal}
+                  whileHover={
+                    shouldReduceMotion
+                      ? undefined
+                      : { y: -3, transition: { duration: 0.2 } }
+                  }
                   className="rounded-2xl border border-slate-200/90 bg-white/65 p-6 shadow-lg shadow-slate-900/[0.035] backdrop-blur-xl md:p-7"
                 >
                   <div className="flex items-center justify-between">
@@ -334,16 +409,25 @@ export default function HomePage() {
                   <p className="mt-3 text-sm leading-6 text-slate-600">
                     {step.description}
                   </p>
-                </article>
+                </motion.article>
               );
             })}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Final CTA */}
-      <section className="px-5 pb-20 md:px-8 md:pb-28">
-        <div className="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white/70 shadow-2xl shadow-slate-900/[0.06] backdrop-blur-2xl px-6 py-14 text-center md:px-12 md:py-20">
+      <motion.section
+        className="px-5 pb-20 md:px-8 md:pb-28"
+        initial={initial}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={stagger}
+      >
+        <motion.div
+          variants={reveal}
+          className="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white/70 px-6 py-14 text-center shadow-2xl shadow-slate-900/[0.06] backdrop-blur-2xl md:px-12 md:py-20"
+        >
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-slate-100">
             <FaGitkraken className="h-6 w-6 text-slate-800" />
           </div>
@@ -363,24 +447,29 @@ export default function HomePage() {
             {user ? "Open dashboard" : "Get started with GitHub"}
             <ArrowRight className="h-4 w-4" />
           </button>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 px-5 py-7 md:px-8">
+      <motion.footer
+        initial={initial}
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.5 }}
+        variants={reveal}
+        className="border-t border-slate-200 px-5 py-7 md:px-8"
+      >
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-around gap-4 text-sm text-slate-500 sm:flex-row">
           <Link href="/" className="flex items-center gap-2 text-slate-800">
             <FaGitkraken className="h-4 w-4" />
             <span className="font-medium">GitCrawler</span>
           </Link>
 
-           <p className="ml-4 text-center text-xs text-slate-500">
+          <p className="ml-4 text-center text-xs text-slate-500">
             © 2026 Git Crawler. Made By Dev Dhama
           </p>
           <p>Explore your code. Understand your projects.</p>
         </div>
-        
-      </footer>
+      </motion.footer>
     </main>
   );
 }

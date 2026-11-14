@@ -17,5 +17,5 @@ export default function ChatPage() {
     );
   }
 
-  return <ChatView repoId={repoId} />;
+  return <ChatView  repoId={repoId} />;
 }

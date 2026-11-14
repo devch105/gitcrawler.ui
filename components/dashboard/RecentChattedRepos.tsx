@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  
   Clock3,
   FolderGit2,
   MessageSquare,
@@ -12,6 +11,8 @@ import {
 import { useRecentChats } from "@/hooks/use-recent-chats";
 
 import { RiChatSmileAiFill } from "react-icons/ri";
+import DashboardCard from "@/components/dashboard/dashboard-card";
+
 function formatLastActivity(value: string) {
   const date = new Date(value);
 
@@ -33,22 +34,18 @@ export default function RecentChattedRepos() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        
         <div>
-          <div className="flex items-center gap-2">  
-          <RiChatSmileAiFill size={22}/>
-          <span className="text-lg font-semibold text-zinc-900">
-            Recent repository conversations
-          </span>
-         
-        </div>
+          <div className="flex items-center gap-2">
+            <RiChatSmileAiFill size={22} />
+            <span className="text-lg font-semibold text-zinc-900">
+              Recent repository conversations
+            </span>
+          </div>
+
           <p className="mt-2 ml-4 text-sm text-zinc-500">
             Pick up where you left off.
           </p>
         </div>
-
-        
-         
 
         <button
           type="button"
@@ -103,15 +100,13 @@ export default function RecentChattedRepos() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {chats.map((chat) => (
-            <button
+            <DashboardCard
               key={chat.id}
-              type="button"
               onClick={() =>
                 router.push(
                   `/chat/${encodeURIComponent(chat.repositoryId)}?sessionId=${encodeURIComponent(chat.id)}`
                 )
               }
-              className="group rounded-xl border border-zinc-200 bg-white p-5 text-left transition hover:border-zinc-400 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="rounded-lg bg-zinc-100 p-2">
@@ -135,7 +130,7 @@ export default function RecentChattedRepos() {
                   {formatLastActivity(chat.lastActivityAt)}
                 </span>
               </div>
-            </button>
+            </DashboardCard>
           ))}
         </div>
       )}

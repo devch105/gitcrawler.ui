@@ -138,3 +138,16 @@ body {
     @apply font-sans;
   }
 }
+/* GitCrawler common page background */
+.page-background {
+  /* min-height: 100vh; */
+  background-color: #F8FAFC;
+  background-image: radial-gradient(
+    ellipse at top,
+    rgba(192, 203, 217, 0.38),
+    transparent 60%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 520px;
+  color: #111827;
+}

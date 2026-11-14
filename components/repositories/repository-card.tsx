@@ -1,7 +1,8 @@
 "use client";
 
 import type { Repository } from "@/types/repository";
-
+import { FaCodeBranch } from "react-icons/fa";
+import { GiWorld } from "react-icons/gi";
 import {
     AlertCircle,
     CheckCircle2,
@@ -121,19 +122,20 @@ export default function RepositoryCard({
                             variant="outline"
                             className="shrink-0 gap-1"
                         >
-                            <Globe2 className="h-3 w-3" />
+                            <GiWorld className="h-3 w-3" />
                             Public
                         </Badge>
                     )}
                 </div>
 
                 {/* Description */}
-                <p className="line-clamp-2 min-h-[40px] text-sm leading-5 text-muted-foreground">
+                <p className="line-clamp-2 min-h-[30px] text-sm leading-5 text-muted-foreground">
                     {repository.description ||
                         "No description available for this repository."}
                 </p>
 
-                {/* Status */}
+                <div className="flex *:items-center justify-between gap-3">
+                    {/* Status */}
                 <Badge
                     variant="outline"
                     className={`w-fit gap-1 ${status.className}`}
@@ -148,9 +150,22 @@ export default function RepositoryCard({
 
                     {status.label}
                 </Badge>
+                 {/* Completed indexing information */}
+                {isCompleted &&
+                    repository.indexedAt && (
+                        <p className="text-xs text-muted-foreground">
+                            Indexed at {" "}
+                            {new Date(
+                                repository.indexedAt
+                            ).toLocaleString()}
+                        </p>
+                    )}
+                </div>
+                
+
             </CardHeader>
 
-            <CardContent className="flex-1 space-y-4">
+            <CardContent className="flex-1 space-y-2">
                 {/* Indexing progress */}
                 {isIndexing && (
                     <div className="space-y-2">
@@ -217,7 +232,7 @@ export default function RepositoryCard({
 
                     <div className="grid grid-cols-1">
                         <div className="rounded-md border bg-muted p-3">
-                        <div className="flex items-center text-xs text-red-500">
+                        <div className="flex items-center text-xs text-muted-foreground">
                             Index your repository to view Files counts and Chunks ?
                         </div>
                         </div>
@@ -240,8 +255,9 @@ export default function RepositoryCard({
 
                     <div className="flex items-center justify-between gap-3">
                         <span className="flex items-center gap-1.5 text-muted-foreground">
-                            <GitBranch className="h-3.5 w-3.5" />
-                            Branch
+                           
+                            <FaCodeBranch className="h-3.5 w-3.5" />
+                             Branch
                         </span>
 
                         <span className="max-w-[150px] truncate font-medium">
@@ -250,17 +266,7 @@ export default function RepositoryCard({
                     </div>
                 </div>
 
-                {/* Completed indexing information */}
-                {isCompleted &&
-                    repository.indexedAt && (
-                        <p className="text-xs text-muted-foreground">
-                            Indexed{" "}
-                            {new Date(
-                                repository.indexedAt
-                            ).toLocaleString()}
-                        </p>
-                    )}
-
+               
                 {/* Error */}
                 {repository.indexStatus === "FAILED" &&
                     repository.errorMessage && (
@@ -272,11 +278,11 @@ export default function RepositoryCard({
                     )}
             </CardContent>
 
-            <CardFooter className="flex gap-2">
+            <CardFooter className="gap-2 border-t border-slate-200/60 bg-white/30 p-5 pt-4 backdrop-blur-md">
                 {/* Chat button only after successful indexing */}
                 {isCompleted && (
                     <Button
-                        className="flex-1 gap-2 bg-green-500 text-white hover:bg-green-600"
+                        className="flex-1 gap-2 bg-[#1AAF5B] text-white hover:bg-[#1AAF5B]/90"
                         onClick={() =>
                             onChat?.(repository)
                         }
