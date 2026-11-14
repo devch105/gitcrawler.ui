@@ -10,7 +10,7 @@ import { LoaderCircle } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { LuPanelLeftClose } from "react-icons/lu";
-import { toast } from "sonner";
+import { sileo } from "sileo";
 
 import { useChatMessages } from "@/hooks/use-chat-message";
 import {
@@ -204,13 +204,18 @@ async function handleDeleteSession(id: string): Promise<void> {
       );
     }
 
-    toast.success("Chat deleted successfully!");
+    sileo.success({
+      title: "Chat deleted",
+      description: "The chat session has been deleted successfully.",
+    });
   } catch (error) {
-    toast.error(
-      error instanceof Error
-        ? error.message
-        : "Unable to delete chat"
-    );
+    sileo.error({
+      title: "Failed to delete chat",
+      description:
+        error instanceof Error
+          ? error.message
+          : "Unable to delete chat",
+    });
   }
 }
 
@@ -307,7 +312,7 @@ async function handleSendMessage(content: string) {
       )}
 
       <section className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-3 z-50 mx-4 rounded-2xl border border-slate-200/80 bg-white/75 shadow-lg shadow-slate-900/[0.04] backdrop-blur-xl md:mx-auto md:max-w-7xl"> 
+        <header className="flex gap-1.5 h-16 justify-center sticky top-3 z-50  shadow-lg bg-transparent backdrop-blur-xl "> 
           <Button
             variant="ghost"
             size="icon"

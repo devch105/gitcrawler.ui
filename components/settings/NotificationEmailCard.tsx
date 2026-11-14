@@ -13,7 +13,7 @@ import {
     getNotificationEmailSettings,
     updateNotificationEmail,
 } from "@/lib/api/settings";
-import {toast} from "sonner";
+import { sileo } from "sileo";
 
 export default function NotificationEmailCard() {
   const [email, setEmail] = useState("");
@@ -59,14 +59,14 @@ export default function NotificationEmailCard() {
       setMessage(
         "Notification email updated successfully."
       );
-      toast.success("Notification email updated successfully.");
+      sileo.success({title: "Notification email updated", description: "You will receive repository indexing updates at the new email address."});
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
           : "Unable to update email address."
       );
-      toast.error("Failed to update notification email.");
+      sileo.error({title: "Failed to update email", description: err instanceof Error ? err.message : "Unable to update email address."});
     } finally {
       setSaving(false);
     }

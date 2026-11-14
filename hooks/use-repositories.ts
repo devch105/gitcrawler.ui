@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -6,10 +7,12 @@ import {
     useQueryClient,
 } from "@tanstack/react-query";
 
+import { sileo } from "sileo";
+
 import {
     fetchRepositories,
-    syncRepositories,
     startRepositoryIndexing,
+    syncRepositories,
 } from "@/lib/api/repositories";
 
 import type { Repository } from "@/types/repository";
@@ -22,13 +25,9 @@ export function useRepositories() {
         queryKey: REPOSITORIES_KEY,
         queryFn: fetchRepositories,
 
-        // Overview and the repositories page share this cache entry, so
-        // moving between them reuses the data instead of refetching.
         staleTime: 5 * 60_000,
         refetchOnWindowFocus: false,
 
-        // Poll only while something is indexing, and stop if a poll fails
-        // so a broken backend is not hit every interval.
         refetchInterval: (query) => {
             if (query.state.status === "error") {
                 return false;
@@ -51,13 +50,23 @@ export function useSyncRepositories() {
     return useMutation({
         mutationFn: syncRepositories,
 
-        // The sync endpoint already returns the full list,
-        // so write it to the cache instead of refetching.
         onSuccess: (repositories) => {
             queryClient.setQueryData<Repository[]>(
                 REPOSITORIES_KEY,
                 repositories
             );
+
+            sileo.success({
+                title: "Repositories synced",
+                description: `${repositories.length} repositories are up to date.`,
+            });
+        },
+
+        onError: () => {
+            sileo.error({
+                title: "Sync failed",
+                description: "Unable to sync repositories. Please try again.",
+            });
         },
     });
 }
@@ -68,9 +77,6 @@ export function useStartRepositoryIndexing() {
     return useMutation({
         mutationFn: startRepositoryIndexing,
 
-        // The response carries the repository with status INDEXING.
-        // Writing it to the cache is enough: it also starts the polling
-        // above, so no invalidate (and no extra request) is needed.
         onSuccess: (repository) => {
             queryClient.setQueryData<Repository[]>(
                 REPOSITORIES_KEY,
@@ -79,13 +85,24 @@ export function useStartRepositoryIndexing() {
                         repo.id === repository.id ? repository : repo
                     )
             );
+
+            sileo.success({
+                title: "Indexing started",
+                description: `${repository.name} is being indexed.`,
+            });
         },
 
-        // If the start was rejected (for example, already indexing),
-        // reload the list so the UI shows the real state.
-        onError: () => {
+        onError: (error) => {
             queryClient.invalidateQueries({
                 queryKey: REPOSITORIES_KEY,
+            });
+
+            sileo.error({
+                title: "Indexing failed",
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Could not start repository indexing.",
             });
         },
     });
