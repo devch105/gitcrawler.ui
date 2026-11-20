@@ -138,6 +138,15 @@ body {
     @apply font-sans;
   }
 }
+
+
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
 /* GitCrawler common page background */
 .page-background {
   /* min-height: 100vh; */
